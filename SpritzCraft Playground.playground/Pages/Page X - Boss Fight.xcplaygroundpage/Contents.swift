@@ -90,9 +90,15 @@ class BossScene: SKScene {
             mage.removeAllActions()
             bosspattern2()
         case Keycode.rightArrow:
-            player.position = CGPoint(x:player.position.x + 20, y:player.position.y)
+            if(player.position.x < frame.size.width / 2) {
+                player.position = CGPoint(x:player.position.x + 20, y:player.position.y)
+            }
+            
         case Keycode.leftArrow:
-            player.position = CGPoint(x:player.position.x - 20, y:player.position.y)
+            if(player.position.x > -frame.size.width / 2) {
+                player.position = CGPoint(x:player.position.x - 20, y:player.position.y)
+            }
+            
         
         default: break
         }
