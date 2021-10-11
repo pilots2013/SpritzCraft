@@ -112,12 +112,14 @@ class BossScene: SKScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in (touches) {
             let location = touch.location(in: self)
-            if(location.x < 0 && player.position.x > -frame.size.width / 2) {
+            let leftMoveAction = SKAction.move(to: CGPoint(x: player.position.x - 500, y: player.position.y), duration: 1)
+            let rightMoveAction = SKAction.move(to: CGPoint(x: player.position.x + 500, y: player.position.y), duration: 1)
+            if(location.x < player.position.x && player.position.x > -frame.size.width / 2) {
             
-                player.position = CGPoint(x:player.position.x - 20, y:player.position.y)
+                player.run(leftMoveAction)
             }
-            else if(location.x > 0 && player.position.x < frame.size.width / 2) {
-                player.position = CGPoint(x:player.position.x + 20, y:player.position.y)
+            else if(location.x > player.position.x && player.position.x < frame.size.width / 2) {
+                player.run(rightMoveAction)
             }
                     
         }
@@ -125,7 +127,11 @@ class BossScene: SKScene {
                     
         
     }
-    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+
+
+        player.removeAllActions()
+    }
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
@@ -136,7 +142,7 @@ class BossScene: SKScene {
 let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 640, height: 480))
 if let scene = BossScene(fileNamed: "BossScene") {
     // Set the scale mode to scale to fit the window
-    scene.scaleMode = .aspectFill
+    scene.scaleMode = .aspectFit
     
     // Present the scene
     sceneView.presentScene(scene)
