@@ -1,6 +1,6 @@
 import Foundation
 
-class GameCharacter {
+public class GameCharacter {
     var curr_hp: Int
     var speed: Float = 1.0
     var max_hp: Int
