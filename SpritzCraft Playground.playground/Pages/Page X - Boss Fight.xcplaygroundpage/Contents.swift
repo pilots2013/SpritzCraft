@@ -3,8 +3,9 @@
 import PlaygroundSupport
 import SpriteKit
 
-
-
+let PlayerCategory: UInt32 = 0x1 << 0
+let WallCategory: UInt32 = 0x2 << 1
+let BulletCategory: UInt32 = 0x3 << 2
 class BossScene: SKScene {
     
     private var label : SKLabelNode!
@@ -22,6 +23,19 @@ class BossScene: SKScene {
         player = SKSpriteNode(imageNamed: "heart")
         player.setScale(0.3)
         player.position = CGPoint(x: 0, y:-frame.size.height/2 + 50)
+        let playerBody = SKPhysicsBody(rectangleOf: player.frame.size)
+        player.physicsBody = playerBody
+        player.physicsBody?.categoryBitMask = PlayerCategory
+        player.physicsBody?.collisionBitMask = WallCategory | BulletCategory
+        player.physicsBody?.contactTestBitMask = WallCategory | BulletCategory
+        player.physicsBody?.usesPreciseCollisionDetection = true
+        let borderBody = SKPhysicsBody(edgeLoopFrom: self.frame)
+        self.physicsBody = borderBody
+        self.physicsBody?.friction = 0
+        borderBody.contactTestBitMask = PlayerCategory
+        borderBody.categoryBitMask = WallCategory
+        borderBody.collisionBitMask = PlayerCategory
+        borderBody.usesPreciseCollisionDetection = true
         mage = SKSpriteNode(imageNamed:"mage")
         mage.setScale(1.5)
         mage.position = CGPoint(x: 0, y:frame.size.height/2 - 50)
@@ -112,8 +126,8 @@ class BossScene: SKScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in (touches) {
             let location = touch.location(in: self)
-            let leftMoveAction = SKAction.move(to: CGPoint(x: player.position.x - 500, y: player.position.y), duration: 1)
-            let rightMoveAction = SKAction.move(to: CGPoint(x: player.position.x + 500, y: player.position.y), duration: 1)
+            let leftMoveAction = SKAction.move(to: CGPoint(x: player.position.x - 5000, y: player.position.y), duration: 10)
+            let rightMoveAction = SKAction.move(to: CGPoint(x: player.position.x + 5000, y: player.position.y), duration: 10)
             if(location.x < player.position.x && player.position.x > -frame.size.width / 2) {
             
                 player.run(leftMoveAction)
@@ -139,7 +153,8 @@ class BossScene: SKScene {
 }
 
 // Load the SKScene from 'GameScene.sks'
-let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 640, height: 480))
+let sceneView = SKView(frame: CGRect(x:0 , y:0, width: UIScreen().bounds.width, height: UIScreen().bounds.height))
+
 if let scene = BossScene(fileNamed: "BossScene") {
     // Set the scale mode to scale to fit the window
     scene.scaleMode = .aspectFit
