@@ -83,6 +83,7 @@ class BossScene: SKScene {
         mage.run(SKAction.repeatForever(SKAction.sequence([wait_1, run, wait_1, run, wait_1, run,  wait_2])))
     }
     
+    /*
     
         override func keyDown(with event: NSEvent) {
         switch(event.keyCode) {
@@ -100,11 +101,30 @@ class BossScene: SKScene {
             }
             
         
+        
         default: break
         }
      
     }
-      
+    */
+    
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        for touch in (touches) {
+            let location = touch.location(in: self)
+            if(location.x < 0 && player.position.x > -frame.size.width / 2) {
+            
+                player.position = CGPoint(x:player.position.x - 20, y:player.position.y)
+            }
+            else if(location.x > 0 && player.position.x < frame.size.width / 2) {
+                player.position = CGPoint(x:player.position.x + 20, y:player.position.y)
+            }
+                    
+        }
+                    
+                    
+        
+    }
     
     
     override func update(_ currentTime: TimeInterval) {
