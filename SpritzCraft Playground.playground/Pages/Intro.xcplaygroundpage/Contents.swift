@@ -13,17 +13,23 @@ class IntroScene : SKScene {
         texture.append(SKTexture(imageNamed: "PrinceMove2"))
         let walkAnimation = SKAction.animate(with: texture, timePerFrame: 0.2)
         let moveR = SKAction.moveBy(x: -600, y: 0, duration: 5)
+        let stop = SKAction.run {
+            man.removeAllActions()
+            man.texture = SKTexture(imageNamed: "Prince")
+        }
         let background = SKSpriteNode(imageNamed:"Forest")
         background.zPosition = 1
         background.size = CGSize(width: self.frame.size.width, height: self.frame.size.height)
         background.position = CGPoint(x: 0, y: 0)
         addChild(background)
-        man = SKSpriteNode (texture: texture[1])
+        man = SKSpriteNode(imageNamed: "Prince")
         man.zPosition = 2
         man.position = CGPoint(x: background.size.width/2, y: -200)
         addChild(man)
         man.run(SKAction.repeatForever(walkAnimation))
-        man.run(moveR)
+        man.run(SKAction.sequence([moveR,stop]))
+        
+       
     }
     
     override func update(_ currentTime: TimeInterval) {
