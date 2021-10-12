@@ -7,7 +7,7 @@ public struct Audio {
     }
     
     public struct EffectFiles {
-        //static let perl = Effect(filename: "perl", type: "wav")
+        public static let fireball = Effect(filename: "fireball_sfx", type: "mp3")
 
     }
 }

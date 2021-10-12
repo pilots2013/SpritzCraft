@@ -23,11 +23,13 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
     private var isInvincible: Bool = false
     private var bullets: [SKTexture] = [fireball, fireball_blue, rock]
     private var audioPlayer: AudioPlayerImpl!
+    private var bulletCount: UInt32! = 0
     var bullet_index: Int = 0
     var background = SKSpriteNode(imageNamed:"background")
     override func didMove(to view: SKView) {
         
         audioPlayer = AudioPlayerImpl()
+        audioPlayer.musicVolume = 0.5
         audioPlayer.play(music:Audio.MusicFiles.bossMusic)
         audioPlayer.currentMusicPlayer?.numberOfLoops = -1
         physicsWorld.contactDelegate = self
@@ -59,10 +61,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         mage.position = CGPoint(x: 0, y:frame.size.height/2 - 50)
         addChild(mage)
         addChild(player)
-        let moverl = SKAction.sequence([.moveTo(x:-frame.size.width/2 + 50, duration:3), .moveTo(x:frame.size.width/2 - 50, duration:3)])
-        let moveud = SKAction.sequence([.moveTo(y:frame.size.height/2 - 70, duration:0.4), .moveTo(y:frame.size.height/2 - 30, duration:0.4)])
-        mage.run(.repeatForever(moverl))
-        mage.run(.repeatForever(moveud))
+        
         bosspattern()
          
     }
@@ -99,13 +98,21 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         Bullet.physicsBody?.collisionBitMask = 0x0
         Bullet.physicsBody?.contactTestBitMask = PlayerCategory
         self.addChild(Bullet)
+        bulletCount = (bulletCount + 1) % 20
+        audioPlayer.effectsVolume = 0.5
+        audioPlayer.play(effect: Audio.EffectFiles.fireball)
+        
     }
     func bosspattern() {
-        let wait = SKAction.wait(forDuration: 0.5)
+        let wait = SKAction.wait(forDuration: 1)
+        
         let run = SKAction.run {
             self.spawnBullet(enemy: self.mage)
            }
-
+        let moverl = SKAction.sequence([.moveTo(x:-frame.size.width/2 + 50, duration:3), .moveTo(x:frame.size.width/2 - 50, duration:3)])
+        let moveud = SKAction.sequence([.moveTo(y:frame.size.height/2 - 70, duration:0.4), .moveTo(y:frame.size.height/2 - 30, duration:0.4)])
+        mage.run(.repeatForever(moverl))
+        mage.run(.repeatForever(moveud))
         mage.run(SKAction.repeatForever(SKAction.sequence([wait, run])))
     }
     func bosspattern2() {
@@ -114,9 +121,10 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         let run = SKAction.run {
             self.spawnBullet(enemy: self.mage)
            }
-        
-        let moverl = SKAction.sequence([.moveTo(x:-frame.size.width/2 + 50, duration:3), .moveTo(x:frame.size.width/2 - 50, duration:3)])
+        let slide = SKAction.moveTo(x: frame.size.width/2 - 50, duration: 0.2)
+        let moverl = SKAction.sequence([.moveTo(x:-frame.size.width/2 + 50, duration:2), .moveTo(x:frame.size.width/2 - 50, duration:2)])
         let moveud = SKAction.sequence([.moveTo(y:frame.size.height/2 - 70, duration:0.4), .moveTo(y:frame.size.height/2 - 30, duration:0.4)])
+        mage.run(slide)
         mage.run(.repeatForever(moverl))
         mage.run(.repeatForever(moveud))
         mage.run(SKAction.repeatForever(SKAction.sequence([wait_1, run, wait_1, run, wait_1, run,  wait_2])))
@@ -156,6 +164,16 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         else if(player.position.x < -frame.size.width / 2 + 60) {
             player.position.x += 1
             player.removeAllActions()
+        }
+        if(bulletCount == 8) {
+            mage.removeAllActions()
+            bosspattern2()
+            bulletCount = (bulletCount + 1) % 20
+        }
+        else if(bulletCount == 18) {
+            mage.removeAllActions()
+            bosspattern()
+            bulletCount = (bulletCount + 1) % 20 
         }
             
     }
