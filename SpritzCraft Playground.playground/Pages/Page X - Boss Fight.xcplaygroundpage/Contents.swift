@@ -20,9 +20,13 @@ var beast_texture_r = SKTexture(imageNamed: "beast_r")
 var beast_texture_spec = SKTexture(imageNamed: "beast_spec")
 var beast_texture_l = SKTexture(imageNamed: "beast_l")
 
+var beast_hit1 = SKTexture(imageNamed: "beast_hit1")
+var beast_hit2 = SKTexture(imageNamed: "beast_hit2")
+var beast_hit3 = SKTexture(imageNamed: "beast_hit3")
+
 var beast_rmove_anim: [SKTexture] = [beast_texture, beast_texture_r]
 var beast_lmove_anim: [SKTexture] = [beast_texture_spec, beast_texture_l]
-
+var beast_hurt_anim: [SKTexture] = [beast_hit1, beast_hit2, beast_hit3, beast_hit2, beast_hit1, beast_texture]
 class BossScene: SKScene, SKPhysicsContactDelegate {
     
     private var label : SKLabelNode!
@@ -203,6 +207,9 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
             run(wait) { [self] in
               isInvincible = false
             }
+            let hurt_action = SKAction.animate(with:beast_hurt_anim, timePerFrame: 0.1)
+            player.removeAllActions()
+            player.run(hurt_action)
             audioSecondary.effectsVolume = 0.5
             audioSecondary.play(effect: Audio.EffectFiles.hurt)
             
@@ -221,7 +228,7 @@ if let scene = BossScene(fileNamed: "BossScene") {
     
     // Present the scene
     
-    sceneView.showsPhysics = true
+    sceneView.showsPhysics = false
     sceneView.presentScene(scene)
 }
 
