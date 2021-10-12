@@ -21,15 +21,15 @@ public struct Character {
         let walkAnimation = SKAction.animate(with: texture, timePerFrame: 0.2)
         let moveR = SKAction.moveBy(x: CGFloat(x), y: CGFloat(y), duration: duration)
         let stop = SKAction.run(stopBlock)
-       let turn = turn()
+        let turn = SKAction.run(turn)
        character.run(SKAction.repeatForever(walkAnimation))
        character.run(SKAction.sequence([moveR,stop,turn]))
     }
     
-    mutating public func turn() -> SKAction{
-        texture = [SKTexture(imageNamed: "Front\(name)"),SKTexture(imageNamed: "\(name)Side")]
-        let turn = SKAction.animate(with: texture, timePerFrame: 0.5)
-        return turn
+    func turn() {
+        let texture2 : [SKTexture] = [SKTexture(imageNamed: "Front\(name)"),SKTexture(imageNamed: "\(name)Side")]
+        let turn = SKAction.animate(with: texture2, timePerFrame: 1)
+        character.run(turn)
     }
     
     func stopBlock(){
