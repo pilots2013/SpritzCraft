@@ -27,8 +27,9 @@ public struct Character {
     }
     
     func turn() {
+        Thread.sleep(forTimeInterval: 1)
         let texture2 : [SKTexture] = [SKTexture(imageNamed: "Front\(name)"),SKTexture(imageNamed: "\(name)Side")]
-        let turn = SKAction.animate(with: texture2, timePerFrame: 1)
+        let turn = SKAction.animate(with: texture2, timePerFrame: 0.5)
         character.run(turn)
     }
     
