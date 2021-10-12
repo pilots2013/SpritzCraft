@@ -4,7 +4,7 @@ import PlaygroundSupport
 import SpriteKit
 import AVKit
 
-
+let patterSplitCount: UInt32 = 30
 let PlayerCategory: UInt32 = 0x1 << 0
 let WallCategory: UInt32 = 0x2 << 1
 let BulletCategory: UInt32 = 0x3 << 2
@@ -23,13 +23,15 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
     private var isInvincible: Bool = false
     private var bullets: [SKTexture] = [fireball, fireball_blue, rock]
     private var audioPlayer: AudioPlayerImpl!
+    private var audioSecondary: AudioPlayerImpl!
     private var bulletCount: UInt32! = 0
     var bullet_index: Int = 0
     var background = SKSpriteNode(imageNamed:"background")
     override func didMove(to view: SKView) {
         
         audioPlayer = AudioPlayerImpl()
-        audioPlayer.musicVolume = 0.5
+        audioSecondary = AudioPlayerImpl()
+        audioPlayer.musicVolume = 0.12
         audioPlayer.play(music:Audio.MusicFiles.bossMusic)
         audioPlayer.currentMusicPlayer?.numberOfLoops = -1
         physicsWorld.contactDelegate = self
@@ -98,8 +100,8 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         Bullet.physicsBody?.collisionBitMask = 0x0
         Bullet.physicsBody?.contactTestBitMask = PlayerCategory
         self.addChild(Bullet)
-        bulletCount = (bulletCount + 1) % 20
-        audioPlayer.effectsVolume = 0.5
+        bulletCount = (bulletCount + 1) % patterSplitCount
+        audioPlayer.effectsVolume = 0.3
         audioPlayer.play(effect: Audio.EffectFiles.fireball)
         
     }
@@ -116,13 +118,13 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         mage.run(SKAction.repeatForever(SKAction.sequence([wait, run])))
     }
     func bosspattern2() {
-        let wait_1 = SKAction.wait(forDuration: 0.2)
-        let wait_2 = SKAction.wait(forDuration: 1  )
+        let wait_1 = SKAction.wait(forDuration:0.2)
+        let wait_2 = SKAction.wait(forDuration:1)
         let run = SKAction.run {
             self.spawnBullet(enemy: self.mage)
            }
         let slide = SKAction.moveTo(x: frame.size.width/2 - 50, duration: 0.2)
-        let moverl = SKAction.sequence([.moveTo(x:-frame.size.width/2 + 50, duration:2), .moveTo(x:frame.size.width/2 - 50, duration:2)])
+        let moverl = SKAction.sequence([.moveTo(x:frame.size.width/2 - 50, duration:2), .moveTo(x:-frame.size.width/2 + 50, duration:2)])
         let moveud = SKAction.sequence([.moveTo(y:frame.size.height/2 - 70, duration:0.4), .moveTo(y:frame.size.height/2 - 30, duration:0.4)])
         mage.run(slide)
         mage.run(.repeatForever(moverl))
@@ -168,12 +170,12 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         if(bulletCount == 8) {
             mage.removeAllActions()
             bosspattern2()
-            bulletCount = (bulletCount + 1) % 20
+            bulletCount = (bulletCount + 1) % patterSplitCount
         }
-        else if(bulletCount == 18) {
+        else if(bulletCount == 28) {
             mage.removeAllActions()
             bosspattern()
-            bulletCount = (bulletCount + 1) % 20 
+            bulletCount = (bulletCount + 1) % patterSplitCount
         }
             
     }
@@ -185,6 +187,9 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
             run(wait) { [self] in
               isInvincible = false
             }
+            audioSecondary.effectsVolume = 0.5
+            audioSecondary.play(effect: Audio.EffectFiles.hurt)
+            
             print("DANNO")
         }
     }

@@ -8,6 +8,7 @@ public struct Audio {
     
     public struct EffectFiles {
         public static let fireball = Effect(filename: "fireball_sfx", type: "mp3")
+        public static let hurt = Effect(filename:"damage", type: "mp3")
 
     }
 }

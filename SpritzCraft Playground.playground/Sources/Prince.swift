@@ -21,9 +21,9 @@ public struct Character {
         let walkAnimation = SKAction.animate(with: texture, timePerFrame: 0.2)
         let moveR = SKAction.moveBy(x: CGFloat(x), y: CGFloat(y), duration: duration)
         let stop = SKAction.run(stopBlock)
-        let turn = SKAction.run(turn)
+    //let turn = SKAction.run(turn)
        character.run(SKAction.repeatForever(walkAnimation))
-       character.run(SKAction.sequence([moveR,stop,turn]))
+    //character.run(SKAction.sequence([moveR,stop,turn]))
     }
     
     func turn() {
