@@ -9,9 +9,20 @@ let PlayerCategory: UInt32 = 0x1 << 0
 let WallCategory: UInt32 = 0x2 << 1
 let BulletCategory: UInt32 = 0x3 << 2
 
+var beast_rmove: [SKTexture]
 var fireball = SKTexture(imageNamed: "Fireball")
 var fireball_blue = SKTexture(imageNamed: "Fireball Blue")
 var rock = SKTexture(imageNamed: "Rock")
+
+
+var beast_texture = SKTexture(imageNamed: "beast")
+var beast_texture_r = SKTexture(imageNamed: "beast_r")
+var beast_texture_spec = SKTexture(imageNamed: "beast_spec")
+var beast_texture_l = SKTexture(imageNamed: "beast_l")
+
+var beast_rmove_anim: [SKTexture] = [beast_texture, beast_texture_r]
+var beast_lmove_anim: [SKTexture] = [beast_texture_spec, beast_texture_l]
+
 class BossScene: SKScene, SKPhysicsContactDelegate {
     
     private var label : SKLabelNode!
@@ -37,11 +48,11 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         physicsWorld.contactDelegate = self
         background.position = CGPoint(x: 0, y: 0)
         addChild(background)
-        player = SKSpriteNode(imageNamed: "heart")
+        player = SKSpriteNode(texture: beast_texture)
         player.setScale(0.3)
         player.name = "player"
         player.position = CGPoint(x: 0, y:-frame.size.height/2 + 50)
-        let playerBody = SKPhysicsBody(rectangleOf: player.frame.size)
+        let playerBody = SKPhysicsBody(circleOfRadius: player.xScale * player.size.width/2)
         player.physicsBody = playerBody
         player.physicsBody?.categoryBitMask = PlayerCategory
         player.physicsBody?.collisionBitMask = WallCategory
@@ -136,14 +147,19 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in (touches) {
             let location = touch.location(in: self)
+            var movement_anim: SKAction
             let leftMoveAction = SKAction.move(to: CGPoint(x: player.position.x - 5000, y: player.position.y), duration: 10)
             let rightMoveAction = SKAction.move(to: CGPoint(x: player.position.x + 5000, y: player.position.y), duration: 10)
-            if(location.x < player.position.x && player.position.x > -frame.size.width / 2) {
             
+            if(location.x < player.position.x && player.position.x > -frame.size.width / 2) {
+                movement_anim = SKAction.animate(with:beast_lmove_anim, timePerFrame: 0.2)
                 player.run(leftMoveAction)
+                player.run(.repeatForever(movement_anim))
             }
             else if(location.x > player.position.x && player.position.x < frame.size.width / 2) {
+                movement_anim = SKAction.animate(with:beast_rmove_anim, timePerFrame: 0.2)
                 player.run(rightMoveAction)
+                player.run(.repeatForever(movement_anim))
             }
                     
         }
@@ -204,6 +220,8 @@ if let scene = BossScene(fileNamed: "BossScene") {
     scene.scaleMode = .aspectFit
     
     // Present the scene
+    
+    sceneView.showsPhysics = true
     sceneView.presentScene(scene)
 }
 
