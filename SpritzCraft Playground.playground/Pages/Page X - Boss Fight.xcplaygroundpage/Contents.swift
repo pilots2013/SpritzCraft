@@ -1,3 +1,4 @@
+//: [Previous](@previous)
 
 import PlaygroundSupport
 import SpriteKit
@@ -428,3 +429,6 @@ if let scene = BossScene(fileNamed: "BossScene") {
 }
 
 PlaygroundSupport.PlaygroundPage.current.liveView = sceneView
+
+
+//: [Next](@next)

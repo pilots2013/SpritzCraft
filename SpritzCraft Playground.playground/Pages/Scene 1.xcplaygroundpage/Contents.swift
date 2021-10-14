@@ -1,3 +1,6 @@
+//: [Previous](@previous)
+
+
 import Foundation
 import PlaygroundSupport
 import SpriteKit
@@ -141,5 +144,8 @@ class Scene1 : SKScene {
 
 PlaygroundPage.current.setLiveView(MenuView())
 
+
+
+//: [Next](@next)
 
 
