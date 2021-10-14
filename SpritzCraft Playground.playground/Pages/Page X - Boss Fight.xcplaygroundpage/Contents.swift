@@ -1,4 +1,3 @@
-//: A SpriteKit based Playground
 
 import PlaygroundSupport
 import SpriteKit
@@ -19,64 +18,81 @@ var fireball = SKTexture(imageNamed: "Fireball")
 var fireball_blue = SKTexture(imageNamed: "Fireball Blue")
 var rock = SKTexture(imageNamed: "Rock")
 
-
+//TEXTURE FOR LIVES
 var hp_0 = SKTexture(imageNamed: "hp_0")
 var hp_1 = SKTexture(imageNamed: "hp_1")
 var hp_2 = SKTexture(imageNamed: "hp_2")
 var hp_3 = SKTexture(imageNamed: "hp_3")
 var hp_4 = SKTexture(imageNamed: "hp_4")
 var hp_5 = SKTexture(imageNamed: "hp_5")
-
 var hp_textures: [SKTexture] = [hp_0, hp_1, hp_2, hp_3, hp_4, hp_5]
+
+//TEXTURE FOR BEAST
 var beast_texture = SKTexture(imageNamed: "beast")
 var beast_texture_r = SKTexture(imageNamed: "beast_r")
 var beast_texture_spec = SKTexture(imageNamed: "beast_spec")
 var beast_texture_l = SKTexture(imageNamed: "beast_l")
 
+//TEXTURE FOR BEAST HIT
 var beast_hit1 = SKTexture(imageNamed: "beast_hit1")
 var beast_hit2 = SKTexture(imageNamed: "beast_hit2")
 var beast_hit3 = SKTexture(imageNamed: "beast_hit3")
 
+//TEXTURE FOR MAGE
 var mage_throw = SKTexture(imageNamed: "MageFront")
 var mage_throw2 = SKTexture(imageNamed: "MageFront2")
 
-
+//ANIMATION FOR BEAST
 var beast_rmove_anim: [SKTexture] = [beast_texture, beast_texture_r]
 var beast_lmove_anim: [SKTexture] = [beast_texture_spec, beast_texture_l]
 var beast_hurt_anim: [SKTexture] = [beast_hit1, beast_hit2, beast_hit3, beast_hit2, beast_hit1, beast_texture]
+
+//BOSSFIGHT CLASS
 class BossScene: SKScene, SKPhysicsContactDelegate {
     
-    private var label : SKLabelNode!
-    private var spinnyNode : SKShapeNode!
+//    DECLARATION OF NODES FOR SKS
     private var enemy : SKSpriteNode!
     private var player: SKSpriteNode!
     private var mage: SKSpriteNode!
     private var touch: UITouch?
     private var health_bar: SKSpriteNode!
+//    DECLARATION OF HP POINTS
     private var health_points: Int = 5
     private var mage_hp = 3
+//    BOOL FOR CONDITION OF INVICIBILITY OF THE BEAST AND POWER
     private var isInvincible: Bool = false
     private var isPowered: Bool = false
+//    TEXTURE FOR BULLETS
     private var bullets: [SKTexture] = [fireball, fireball_blue, rock]
+//    AUDIO PLAY DECLARATION
     private var audioPlayer: AudioPlayerImpl!
     private var audioSecondary: AudioPlayerImpl!
+//    COUNTER FOR BULLETS
     private var bulletCount: UInt32! = 0
     var bullet_index: Int = 0
+//    DECLARATION OF BACKGROUND NODE
     var background = SKSpriteNode(imageNamed:"background")
+
+//    WHEN THE SCENE STARTS
     override func didMove(to view: SKView) {
         
+//    AUDIO SETTINGS
         audioPlayer = AudioPlayerImpl()
         audioSecondary = AudioPlayerImpl()
         audioPlayer.musicVolume = 0.12
         audioPlayer.play(music:Audio.MusicFiles.bossMusic)
         audioPlayer.currentMusicPlayer?.numberOfLoops = -1
+//    PHYSICS SETTING
         physicsWorld.contactDelegate = self
+//    BACKGROUND POSITIONING
         background.position = CGPoint(x: 0, y: 0)
         background.zPosition = -2
         addChild(background)
+//    HEALT BAR POSITIONING
         health_bar = SKSpriteNode(texture: hp_5)
         health_bar.setScale(0.2)
         health_bar.position = CGPoint(x:frame.size.width/2 - 200, y:frame.size.height/2 - 40)
+//    PLAYER POSITIONING AND SETTING
         player = SKSpriteNode(texture: beast_texture)
         player.setScale(0.3)
         player.name = "player"
@@ -89,7 +105,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         player.physicsBody?.usesPreciseCollisionDetection = true
         player.physicsBody?.isDynamic = false
         player.physicsBody?.affectedByGravity = true
-        
+//    BORDER SETTING
         let borderBody = SKPhysicsBody(edgeLoopFrom: self.frame)
         self.physicsBody = borderBody
         self.physicsBody?.friction = 0.1
@@ -98,6 +114,8 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         borderBody.collisionBitMask = PlayerCategory
         borderBody.usesPreciseCollisionDetection = true
         borderBody.isDynamic = false
+        
+//     MAGE POSITIONING
         mage = SKSpriteNode(imageNamed:"MageFront")
         
         mage.name = "mage"
@@ -112,7 +130,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         addChild(health_bar)
         addChild(mage)
         addChild(player)
-        
+//     LET THE GAME BEGIN.
         bosspattern()
          
     }
@@ -127,7 +145,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
     
 
     
-
+// FUNCTION FOR SPAWNING BULLETS
     func spawnBullet(enemy: SKSpriteNode) {
        
         
@@ -155,7 +173,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         
     }
     
-    
+//  FUNCTION FOR SPAWNING CRYSTALS
     func spawnCrystal(enemy: SKSpriteNode) {
        
         
@@ -176,6 +194,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(crystal)
         
     }
+//  FUNCTION FOR THE FIRST PATTERN OF THE BOSS
     func bosspattern() {
         let wait = SKAction.wait(forDuration: 1)
         
@@ -189,6 +208,8 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         mage.run(.repeatForever(moveud))
         mage.run(SKAction.repeatForever(SKAction.sequence([wait, run])))
     }
+    
+//  FUNCTION FOR THE SECOND PATTERN OF THE BOSS
     func bosspattern2() {
         let wait_1 = SKAction.wait(forDuration:0.2)
         let wait_2 = SKAction.wait(forDuration:1)
@@ -205,7 +226,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         mage.run(SKAction.repeatForever(SKAction.sequence([wait_1, run, wait_1, run, wait_1, run,  wait_2])))
     }
     
-            
+//  FUNCTION FOR GAME CONTROLS AND TOUCHES
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in (touches) {
             let location = touch.location(in: self)
@@ -253,15 +274,20 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
                     
         
     }
+    
+// FUNCTION TO REMOVE THE ACTIONS WHILE NO TOUCHING THE SCREEN
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
 
         player.removeAllActions()
     }
 
+// COUNT FOR SPAWNING CRYSTALS
     var count : Int = 0
+// FUNCTION TO UPDATE AT EVERY FRAME
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         count+=1
+//FUNCTION TO KEEP THE PLAYER INSIDE THE BORDERS
         if(player.position.x >= frame.size.width / 2 - 60) {
             player.position.x -= 1
             player.removeAllActions()
@@ -270,6 +296,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
             player.position.x += 1
             player.removeAllActions()
         }
+// FUNCTION TO CHANGE BOSS PATTERN
         if(bulletCount == 8) {
             mage.removeAllActions()
             bosspattern2()
@@ -280,17 +307,19 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
             bosspattern()
             bulletCount = (bulletCount + 1) % patterSplitCount
         }
+// FUNCTION TO KEEP SPAWNING CRYSTALS EVERY 20 SECONDS
         if count%1200==0{
             spawnCrystal(enemy: mage)
             bulletCount = (bulletCount + 1) % patterSplitCount
         }
+// FUNCTION TO CHECK MAGE HP AND GIVE THE END OF THE SCENE
         if self.mage_hp == 0{
             audioPlayer.currentMusicPlayer?.setVolume(0, fadeDuration: 0.2)
             let mageO = MageO(fileNamed: "MageO")
             mageO?.scaleMode = .aspectFit
             sceneView.presentScene(mageO!, transition: SKTransition.fade(withDuration: 0.2))
         }
-        
+//FUNCION TO GIVE GAME OVER
         if self.health_points == 0{
             audioPlayer.currentMusicPlayer?.setVolume(0, fadeDuration: 0.2)
             let sceneGO = GameOver(fileNamed: "GameOver")
@@ -299,7 +328,10 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         }
             
     }
+// FUNCTIONS TO CHECK COLLISIONS
     func didBegin(_ contact: SKPhysicsContact) {
+        
+//  FUNCTION IF PLAYER GET HIT AND TAKE INVINCIBILITY FOR 2 SEC AND -1 HP
         if (contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "bullet" && !isInvincible) {
             isInvincible = true
             
@@ -322,12 +354,15 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
             audioSecondary.play(effect: Audio.EffectFiles.hurt)
             
         }
+//FUNCTION TO GIVE THE POWER TO THE PLAYER AND COLOR IT GREEN
         if(contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "crystal" && !isPowered) {
             isPowered = true
             player.colorBlendFactor = 0.6
             player.color = UIColor.systemGreen
             contact.bodyB.node?.removeFromParent() 
         }
+
+// FUNCTION TO -1 HP TO THE MAGE IF HE GETS HIT
         if(contact.bodyA.node?.name == "beam" && contact.bodyB.node?.name == "mage"){
             let fadeIO = SKAction.sequence([SKAction.fadeIn(withDuration: 0.1),SKAction.fadeOut(withDuration: 0.1),SKAction.fadeIn(withDuration: 0.1),SKAction.fadeOut(withDuration: 0.1),SKAction.fadeIn(withDuration: 0.1),SKAction.fadeOut(withDuration: 0.1),SKAction.fadeIn(withDuration: 0.1),SKAction.fadeOut(withDuration: 0.1),SKAction.fadeIn(withDuration: 0.1),SKAction.fadeOut(withDuration: 0.1),SKAction.fadeIn(withDuration: 0.1)])
             mage.run(fadeIO)
@@ -338,10 +373,13 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
     
 }
 
+// GAME OVER SCENE CLASS
 class GameOver : SKScene {
     override func didMove(to view: SKView) {
        
     }
+
+//FUNCTION FOR GIVING RETRY BUTTON
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in (touches) {
             let retry = childNode(withName: "Retry")
@@ -367,6 +405,7 @@ class GameOver : SKScene {
     }
 }
 
+//SCENE FOR MAGE DEFEAT
 class MageO : SKScene {
     override func didMove(to view: SKView) {
        
@@ -376,7 +415,6 @@ class MageO : SKScene {
         // Called before each frame is rendered
     }
 }
-// Load the SKScene from 'GameScene.sks'
 let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 1920, height: 1080))
 
 if let scene = BossScene(fileNamed: "BossScene") {

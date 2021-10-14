@@ -12,13 +12,13 @@ struct MenuView : View {
         
         ZStack {
             
-            // Sfondo Nero
+            // BLACK BACKGROUND
             Rectangle()
                 .fill(Color.black)
                 .frame(width: 1920, height: 1080)
                 .scaledToFit()
             
-            // Logo BeastHeart
+            // BEASTHEART LOGO
             Image(uiImage: UIImage(named: "LogoHeart")!)
                 .resizable()
                 .scaledToFit()
@@ -29,7 +29,7 @@ struct MenuView : View {
             
             VStack {
                 
-                // Titolo
+                // TITLE
                 Image(uiImage: UIImage(named: "TitleBeast")!)
                     .resizable()
                     .scaledToFit()
@@ -37,9 +37,9 @@ struct MenuView : View {
                 
                 HStack {
                     
-                    // Bottone start
+                    // START BUTTON
                     Button(action: {
-                        
+//                        LAUNCH THE FIRST SCENE
                         let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 1920, height: 1080))
                         if let scene = Scene1(fileNamed: "Scene1") {
                             // Set the scale mode to scale to fit the window
@@ -57,8 +57,10 @@ struct MenuView : View {
                             .frame(width: 720, height: 660)
                     }
                     
-                    // Bottone come giocare
+                    //HOW TO PLAY BUTTON
                     Button(action: {
+                        
+//                        LAUNCH THE TUTORIAL
                         let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 640, height: 480))
                         if let scene = GameScene(fileNamed: "HowToPlay") {
                             // Set the scale mode to scale to fit the window
