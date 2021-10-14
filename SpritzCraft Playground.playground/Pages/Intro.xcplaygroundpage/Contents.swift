@@ -12,18 +12,6 @@ class IntroScene : SKScene {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let scene1 = Scene1(fileNamed: "Scene1")
-        scene1?.scaleMode = .aspectFit
-        sceneView.presentScene(scene1)
-    }
-    
-    override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
-    }
-}
-
-class Scene1 : SKScene {
-    override func didMove(to view: SKView) {
        
     }
     

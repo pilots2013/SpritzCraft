@@ -11,9 +11,22 @@ class Scene3 : SKScene {
        
     }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let scene = SceneGood(fileNamed: "Scene3 Good")
-        scene?.scaleMode = .aspectFit
-        sceneView.presentScene(scene)
+        for touch in (touches) {
+            let giveIt = childNode(withName: "GiveIt")
+            let takeIt = childNode(withName: "TakeIt")
+            let touchLocation = touch.location(in: self)
+
+            if(giveIt!.contains(touchLocation)){
+                let sceneG = SceneGood(fileNamed: "Scene3 Good")
+                sceneG?.scaleMode = .aspectFit
+                sceneView.presentScene(sceneG)
+            }
+            if(takeIt!.contains(touchLocation)){
+                let sceneB = BadScene(fileNamed: "Scene3 Bad")
+                sceneB?.scaleMode = .aspectFit
+                sceneView.presentScene(sceneB)
+            }
+        }
     }
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
@@ -29,6 +42,17 @@ class SceneGood : SKScene{
         // Called before each frame is rendered
     }
 }
+
+class BadScene : SKScene{
+    override func didMove(to view: SKView) {
+       
+    }
+    
+    override func update(_ currentTime: TimeInterval) {
+        // Called before each frame is rendered
+    }
+}
+
 
 let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 1920, height: 1080))
 
