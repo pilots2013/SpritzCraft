@@ -282,7 +282,10 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
             bulletCount = (bulletCount + 1) % patterSplitCount
         }
         if self.mage_hp == 0{
-            
+            audioPlayer.currentMusicPlayer?.setVolume(0, fadeDuration: 0.2)
+            let mageO = MageO(fileNamed: "MageO")
+            mageO?.scaleMode = .aspectFit
+            sceneView.presentScene(mageO!, transition: SKTransition.fade(withDuration: 0.2))
         }
         
         if self.health_points == 0{
@@ -331,6 +334,16 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
 }
 
 class GameOver : SKScene {
+    override func didMove(to view: SKView) {
+       
+    }
+    
+    override func update(_ currentTime: TimeInterval) {
+        // Called before each frame is rendered
+    }
+}
+
+class MageO : SKScene {
     override func didMove(to view: SKView) {
        
     }
