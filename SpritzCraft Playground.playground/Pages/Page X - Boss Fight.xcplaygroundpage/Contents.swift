@@ -10,6 +10,8 @@ let patterSplitCount: UInt32 = 40
 let PlayerCategory: UInt32 = 0x1 << 0
 let WallCategory: UInt32 = 0x2 << 1
 let BulletCategory: UInt32 = 0x3 << 2
+let MageCategory: UInt32 = 0x4 << 3
+let BeamCategory: UInt32 = 0x5 << 4
 
 //TEXTURES FOR SPRITES
 var beast_rmove: [SKTexture]
@@ -35,6 +37,10 @@ var beast_hit1 = SKTexture(imageNamed: "beast_hit1")
 var beast_hit2 = SKTexture(imageNamed: "beast_hit2")
 var beast_hit3 = SKTexture(imageNamed: "beast_hit3")
 
+var mage_throw = SKTexture(imageNamed: "MageFront")
+var mage_throw2 = SKTexture(imageNamed: "MageFront2")
+
+
 var beast_rmove_anim: [SKTexture] = [beast_texture, beast_texture_r]
 var beast_lmove_anim: [SKTexture] = [beast_texture_spec, beast_texture_l]
 var beast_hurt_anim: [SKTexture] = [beast_hit1, beast_hit2, beast_hit3, beast_hit2, beast_hit1, beast_texture]
@@ -48,6 +54,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
     private var touch: UITouch?
     private var health_bar: SKSpriteNode!
     private var health_points: Int = 5
+    private var mage_hp = 3
     private var isInvincible: Bool = false
     private var isPowered: Bool = false
     private var bullets: [SKTexture] = [fireball, fireball_blue, rock]
@@ -65,6 +72,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         audioPlayer.currentMusicPlayer?.numberOfLoops = -1
         physicsWorld.contactDelegate = self
         background.position = CGPoint(x: 0, y: 0)
+        background.zPosition = -2
         addChild(background)
         health_bar = SKSpriteNode(texture: hp_5)
         health_bar.setScale(0.2)
@@ -73,7 +81,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         player.setScale(0.3)
         player.name = "player"
         player.position = CGPoint(x: 0, y:-frame.size.height/2 + 60)
-        let playerBody = SKPhysicsBody(circleOfRadius: player.xScale * player.size.width/2)
+        let playerBody = SKPhysicsBody(rectangleOf: CGSize(width: player.size.width, height: player.size.height))
         player.physicsBody = playerBody
         player.physicsBody?.categoryBitMask = PlayerCategory
         player.physicsBody?.collisionBitMask = WallCategory
@@ -90,9 +98,17 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         borderBody.collisionBitMask = PlayerCategory
         borderBody.usesPreciseCollisionDetection = true
         borderBody.isDynamic = false
-        mage = SKSpriteNode(imageNamed:"mage")
+        mage = SKSpriteNode(imageNamed:"MageFront")
+        
+        mage.name = "mage"
+        mage.zPosition = -1
         mage.setScale(2)
         mage.position = CGPoint(x: 0, y:frame.size.height/2 - 80)
+        mage.physicsBody = SKPhysicsBody(circleOfRadius: mage.xScale * mage.size.width/2)
+        mage.physicsBody?.categoryBitMask = MageCategory
+        mage.physicsBody?.contactTestBitMask = BeamCategory
+        mage.physicsBody?.affectedByGravity = false
+        mage.physicsBody?.collisionBitMask = 0
         addChild(health_bar)
         addChild(mage)
         addChild(player)
@@ -149,12 +165,11 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         crystal.setScale(0.4)
         crystal.position = CGPoint(x: enemy.position.x, y: enemy.position.y)
         
-        let action = SKAction.moveTo(y: -self.size.height/2, duration: 2)
-        let actionDone = SKAction.removeFromParent()
-        crystal.run(SKAction.sequence([action, actionDone]))
+        let action = SKAction.moveTo(y: -frame.size.height/2+60, duration: 5)
+        crystal.run(action)
 
         crystal.physicsBody = SKPhysicsBody(circleOfRadius: crystal.frame.height/2)
-            
+        crystal.physicsBody?.affectedByGravity = false
         crystal.physicsBody?.categoryBitMask = BulletCategory
         crystal.physicsBody?.collisionBitMask = 0x0
         crystal.physicsBody?.contactTestBitMask = PlayerCategory
@@ -169,6 +184,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
            }
         let moverl = SKAction.sequence([.moveTo(x:-frame.size.width/2 + 50, duration:3), .moveTo(x:frame.size.width/2 - 50, duration:3)])
         let moveud = SKAction.sequence([.moveTo(y:frame.size.height/2 - 120, duration:0.4), .moveTo(y:frame.size.height/2 - 80, duration:0.4)])
+        mage.run(SKAction.repeatForever(SKAction.animate(with: [mage_throw,mage_throw2], timePerFrame: 0.5)))
         mage.run(.repeatForever(moverl))
         mage.run(.repeatForever(moveud))
         mage.run(SKAction.repeatForever(SKAction.sequence([wait, run])))
@@ -185,6 +201,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         mage.run(slide)
         mage.run(.repeatForever(moverl))
         mage.run(.repeatForever(moveud))
+        mage.run(SKAction.repeatForever(SKAction.animate(with: [mage_throw,mage_throw2], timePerFrame: 0.5)))
         mage.run(SKAction.repeatForever(SKAction.sequence([wait_1, run, wait_1, run, wait_1, run,  wait_2])))
     }
     
@@ -192,6 +209,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in (touches) {
             let location = touch.location(in: self)
+            let touchedNode = self.atPoint(location)
             var movement_anim: SKAction
             let leftMoveAction = SKAction.move(to: CGPoint(x: player.position.x - 5000, y: player.position.y), duration: 10)
             let rightMoveAction = SKAction.move(to: CGPoint(x: player.position.x + 5000, y: player.position.y), duration: 10)
@@ -206,7 +224,27 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
                 player.run(rightMoveAction)
                 player.run(.repeatForever(movement_anim))
             }
+            if let name=touchedNode.name{
+                if name == "player" && isPowered{
+                    let beam : [SKTexture] = [SKTexture(imageNamed: "beam"),SKTexture(imageNamed: "beam2"),SKTexture(imageNamed: "beam3")]
+                    let iBeam = SKSpriteNode(imageNamed: "beam")
+                    let bang = SKAction.animate(with: beam, timePerFrame: 0.1)
+                    iBeam.name = "beam"
+                    iBeam.zPosition = -1
+                    iBeam.position.x = player.position.x
+                    iBeam.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: iBeam.size.width, height: iBeam.size.height))
+                    iBeam.physicsBody?.categoryBitMask = BeamCategory
+                    iBeam.physicsBody?.contactTestBitMask = MageCategory
+                    iBeam.physicsBody?.affectedByGravity = false
+                    iBeam.physicsBody?.collisionBitMask = 0
+                    addChild(iBeam)
+                    iBeam.scale(to: CGSize(width: 200, height: 2000))
+                    iBeam.run(SKAction.sequence([bang,SKAction.fadeOut(withDuration: 0.1),SKAction.removeFromParent()]))
+                    isPowered = false
+                    player.colorBlendFactor = 0.0
                     
+                }
+            }
         }
                     
                     
@@ -217,9 +255,10 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
         player.removeAllActions()
     }
 
-    
+    var count : Int = 0
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+        count+=1
         if(player.position.x >= frame.size.width / 2 - 60) {
             player.position.x -= 1
             player.removeAllActions()
@@ -238,9 +277,19 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
             bosspattern()
             bulletCount = (bulletCount + 1) % patterSplitCount
         }
-        if(bulletCount == 20) {
+        if count%1200==0{
             spawnCrystal(enemy: mage)
             bulletCount = (bulletCount + 1) % patterSplitCount
+        }
+        if self.mage_hp == 0{
+            
+        }
+        
+        if self.health_points == 0{
+            audioPlayer.currentMusicPlayer?.setVolume(0, fadeDuration: 0.2)
+            let sceneGO = GameOver(fileNamed: "GameOver")
+            sceneGO?.scaleMode = .aspectFit
+            sceneView.presentScene(sceneGO!, transition: SKTransition.fade(withDuration: 0.2))
         }
             
     }
@@ -266,18 +315,30 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
             audioSecondary.effectsVolume = 0.5
             audioSecondary.play(effect: Audio.EffectFiles.hurt)
             
-            print("DANNO")
         }
         if(contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "crystal" && !isPowered) {
             isPowered = true
             player.colorBlendFactor = 0.6
             player.color = UIColor.systemGreen
-            print("POWAHHH!!!")
+            contact.bodyB.node?.removeFromParent() 
         }
+        if(contact.bodyA.node?.name == "beam" && contact.bodyB.node?.name == "mage"){
+            self.mage_hp -= 1
+        }
+        
     }
     
 }
 
+class GameOver : SKScene {
+    override func didMove(to view: SKView) {
+       
+    }
+    
+    override func update(_ currentTime: TimeInterval) {
+        // Called before each frame is rendered
+    }
+}
 // Load the SKScene from 'GameScene.sks'
 let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 1920, height: 1080))
 
@@ -287,7 +348,7 @@ if let scene = BossScene(fileNamed: "BossScene") {
     
     // Present the scene
     
-    sceneView.showsPhysics = false
+    sceneView.showsPhysics = true
     sceneView.presentScene(scene)
 }
 
