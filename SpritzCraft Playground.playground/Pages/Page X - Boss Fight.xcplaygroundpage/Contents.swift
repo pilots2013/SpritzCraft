@@ -226,8 +226,10 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
             }
             if let name=touchedNode.name{
                 if name == "player" && isPowered{
+                    let beastBeam : [SKTexture] = [SKTexture(imageNamed: "BeastBeam1"),SKTexture(imageNamed: "BeastBeam2"),SKTexture(imageNamed: "BeastBeam3"),SKTexture(imageNamed: "BeastBeam1"),SKTexture(imageNamed: "beast")]
                     let beam : [SKTexture] = [SKTexture(imageNamed: "beam"),SKTexture(imageNamed: "beam2"),SKTexture(imageNamed: "beam3")]
                     let iBeam = SKSpriteNode(imageNamed: "beam")
+                    let beastB = SKAction.animate(with: beastBeam, timePerFrame: 0.1)
                     let bang = SKAction.animate(with: beam, timePerFrame: 0.1)
                     iBeam.name = "beam"
                     iBeam.zPosition = -1
@@ -240,6 +242,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
                     addChild(iBeam)
                     iBeam.scale(to: CGSize(width: 200, height: 2000))
                     iBeam.run(SKAction.sequence([bang,SKAction.fadeOut(withDuration: 0.1),SKAction.removeFromParent()]))
+                    player.run(beastB)
                     isPowered = false
                     player.colorBlendFactor = 0.0
                     
@@ -304,7 +307,7 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
             run(wait) { [self] in
               isInvincible = false
             }
-            let hurt_action = SKAction.animate(with:beast_hurt_anim, timePerFrame: 0.1)
+            let hurt_action = SKAction.animate(with:beast_hurt_anim, timePerFrame: 0.05)
             self.health_points -= 1
             if(self.health_points >= 0) {
                 let hp_loss_action = SKAction.setTexture(hp_textures[health_points])
@@ -326,6 +329,8 @@ class BossScene: SKScene, SKPhysicsContactDelegate {
             contact.bodyB.node?.removeFromParent() 
         }
         if(contact.bodyA.node?.name == "beam" && contact.bodyB.node?.name == "mage"){
+            let fadeIO = SKAction.sequence([SKAction.fadeIn(withDuration: 0.1),SKAction.fadeOut(withDuration: 0.1),SKAction.fadeIn(withDuration: 0.1),SKAction.fadeOut(withDuration: 0.1),SKAction.fadeIn(withDuration: 0.1),SKAction.fadeOut(withDuration: 0.1),SKAction.fadeIn(withDuration: 0.1),SKAction.fadeOut(withDuration: 0.1),SKAction.fadeIn(withDuration: 0.1),SKAction.fadeOut(withDuration: 0.1),SKAction.fadeIn(withDuration: 0.1)])
+            mage.run(fadeIO)
             self.mage_hp -= 1
         }
         
@@ -337,7 +342,26 @@ class GameOver : SKScene {
     override func didMove(to view: SKView) {
        
     }
-    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        for touch in (touches) {
+            let retry = childNode(withName: "Retry")
+            let touchLocation = touch.location(in: self)
+
+            if((retry?.contains(touchLocation)) != nil){
+                if let scene = BossScene(fileNamed: "BossScene") {
+                    // Set the scale mode to scale to fit the window
+                    scene.scaleMode = .aspectFit
+                    
+                    // Present the scene
+                    
+                    sceneView.showsPhysics = false
+                    sceneView.presentScene(scene)
+                }
+            }
+            
+            
+        }
+    }
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
     }
@@ -361,7 +385,7 @@ if let scene = BossScene(fileNamed: "BossScene") {
     
     // Present the scene
     
-    sceneView.showsPhysics = true
+    sceneView.showsPhysics = false
     sceneView.presentScene(scene)
 }
 
