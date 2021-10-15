@@ -106,11 +106,16 @@ class GameScene: SKScene {
 
     }
     
-    @objc static override var supportsSecureCoding: Bool {
-        // SKNode conforms to NSSecureCoding, so any subclass going
-        // through the decoding process must support secure coding
-        get {
-            return true
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        
+        for touch in (touches) {
+            let back = childNode(withName: "BackB")
+            let touchLocation = touch.location(in: self)
+
+            if(back!.contains(touchLocation)){
+                PlaygroundPage.current.setLiveView(MenuView())
+            }
         }
     }
     
