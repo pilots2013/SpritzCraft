@@ -7,8 +7,13 @@ import CoreGraphics
 
 
 class IntroScene : SKScene {
+    let backgroundMusic = SKAudioNode(fileNamed: "IntroSceneMusic")
     override func didMove(to view: SKView) {
-       
+        let wait = SKAction.wait(forDuration: 30)
+        let fade = SKAction.changeVolume(to: 0, duration: 10)
+        addChild(backgroundMusic)
+        backgroundMusic.run(SKAction.play())
+        backgroundMusic.run(SKAction.sequence([wait,fade]))
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

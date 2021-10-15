@@ -133,8 +133,13 @@ class GameScene: SKScene {
 }
 
 class Scene1 : SKScene {
+    let backgroundMusic = SKAudioNode(fileNamed: "Scene1Music")
     override func didMove(to view: SKView) {
-       
+        let wait = SKAction.wait(forDuration: 25)
+        let fade = SKAction.changeVolume(to: 0, duration: 10)
+        addChild(backgroundMusic)
+        backgroundMusic.run(SKAction.play())
+        backgroundMusic.run(SKAction.sequence([wait,fade]))
     }
     
     override func update(_ currentTime: TimeInterval) {
